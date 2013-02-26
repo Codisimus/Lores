@@ -27,7 +27,7 @@ public class Lores extends JavaPlugin implements CommandExecutor {
         }
 
         //Log the version and build numbers
-        getLogger().info("Shortcuts " + this.getDescription().getVersion()
+        getLogger().info("Lores " + this.getDescription().getVersion()
                 + " (Build " + version.getProperty("Build") + ") is enabled!");
     }
 
