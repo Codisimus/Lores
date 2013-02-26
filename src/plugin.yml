@@ -1,0 +1,24 @@
+name: Lores
+main: com.codisimus.plugins.lores.Lores
+version: 1.0
+author: Codisimus
+website: www.codisimus.com
+description: Modify Item names and lores
+commands:
+  lore:
+    description: Main command for the plugin
+    usage: |
+           §e     Lores Help Page:
+           §5Use §6& §5to add color with any command
+           §5Each command will modify the Item in your hand
+           §2/lore name <custom name> §bSet the new Name of the Item
+           §2/lore add <line of text> §bAdd a line to the lore
+           §2/lore set <line #> <line of text> §bChange a line of the lore
+           §2/lore delete [line #] §bDelete a line of the lore (last line by default)
+           §2/lore clear §bClear all lines of the lore
+           §2/lore undo §bUndoes your last modification (up to 5 times)
+    permission: lores.admin
+    permission-message: You do not have permission to do that
+permissions:
+  lores.admin:
+    default: op
