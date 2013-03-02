@@ -35,7 +35,8 @@ public class Lores extends JavaPlugin implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String alias, String[] args) {
         //This Command is only useful to Players
         if (!(sender instanceof Player)) {
-            return false;
+            sendHelp(sender);
+            return true;
         }
         Player player = (Player) sender;
 
@@ -44,7 +45,8 @@ public class Lores extends JavaPlugin implements CommandExecutor {
 
         //There must be at least one argument
         if (args.length < 1) {
-            return false;
+            sendHelp(sender);
+            return true;
         }
 
         //Retrieve the lore and make one if it doesn't exist
@@ -58,7 +60,8 @@ public class Lores extends JavaPlugin implements CommandExecutor {
         try {
             action = Action.valueOf(args[0].toUpperCase());
         } catch (IllegalArgumentException notEnum) {
-            return false;
+            sendHelp(sender);
+            return true;
         }
 
         //Generate the String id for the Player/Item
@@ -82,9 +85,9 @@ public class Lores extends JavaPlugin implements CommandExecutor {
 
         switch (action) {
         case NAME: //Change the Name of the Item
-            //Ensure that we are given the correct number of arguments
-            if (args.length < 2) {
-                return false;
+            if (!sender.hasPermission("lores.name") || args.length < 2) {
+                sendHelp(sender);
+                return true;
             }
 
             String name = concatArgs(args, 1);
@@ -106,9 +109,9 @@ public class Lores extends JavaPlugin implements CommandExecutor {
             break;
 
         case OWNER: //Change the Owner of the Skull
-            //Ensure that we are given the correct number of arguments
-            if (args.length != 2) {
-                return false;
+            if (!sender.hasPermission("lores.owner") || args.length < 2) {
+                sendHelp(sender);
+                return true;
             }
 
             if (!(meta instanceof SkullMeta)) {
@@ -120,15 +123,20 @@ public class Lores extends JavaPlugin implements CommandExecutor {
             break;
 
         case ADD: //Add a line to the end of the lore
-            //Ensure that we are given the correct number of arguments
-            if (args.length < 2) {
-                return false;
+            if (!sender.hasPermission("lores.name") || args.length < 2) {
+                sendHelp(sender);
+                return true;
             }
 
             lore.add(concatArgs(args, 1));
             break;
 
         case DELETE: //Delete a line of the lore
+            if (!sender.hasPermission("lores.lore")) {
+                sendHelp(sender);
+                return true;
+            }
+
             switch (args.length) {
             case 1: //Delete the last line
                 if (lore.size() < 1) {
@@ -162,9 +170,9 @@ public class Lores extends JavaPlugin implements CommandExecutor {
             break;
 
         case SET: //Change a line of the lore
-            //Ensure that we are given the correct number of arguments
-            if (args.length < 3) {
-                return false;
+            if (!sender.hasPermission("lores.lore") || args.length < 3) {
+                sendHelp(sender);
+                return true;
             }
 
             //Ensure that the argument is an Integer
@@ -185,9 +193,9 @@ public class Lores extends JavaPlugin implements CommandExecutor {
             break;
 
         case INSERT: //Insert a line into the lore
-            //Ensure that we are given the correct number of arguments
-            if (args.length < 3) {
-                return false;
+            if (!sender.hasPermission("lores.lore") || args.length < 3) {
+                sendHelp(sender);
+                return true;
             }
 
             //Ensure that the argument is an Integer
@@ -208,9 +216,9 @@ public class Lores extends JavaPlugin implements CommandExecutor {
             break;
 
         case CLEAR:
-            //Ensure that we are given the correct number of arguments
-            if (args.length != 1) {
-                return false;
+            if (!sender.hasPermission("lores.lore") || args.length != 1) {
+                sendHelp(sender);
+                return true;
             }
 
             lore.clear();
@@ -261,5 +269,32 @@ public class Lores extends JavaPlugin implements CommandExecutor {
         }
         string = string.replaceAll("§[lnokm]", "");
         return string.isEmpty() ? string : string.substring(1);
+    }
+
+    /**
+     * Displays the Lores Help Page to the given Player
+     *
+     * @param player The Player needing help
+     */
+    private static void sendHelp(CommandSender sender) {
+        sender.sendMessage("§e     Lores Help Page:");
+        sender.sendMessage("§5Each command will modify the Item in your hand");
+        if (sender.hasPermission("lores.color") || sender.hasPermission("lores.format")) {
+            sender.sendMessage("§5Use §6& §5to add color with any command");
+        }
+        if (sender.hasPermission("lores.name")) {
+            sender.sendMessage("§2/lore name <custom name> §bSet the new Name of the Item");
+        }
+        if (sender.hasPermission("lores.owner")) {
+            sender.sendMessage("§2/lore owner <player> §bChange the Owner of a Skull");
+        }
+        if (sender.hasPermission("lores.lore")) {
+            sender.sendMessage("§2/lore add <line of text> §bAdd a line to the lore");
+            sender.sendMessage("§2/lore set <line #> <line of text> §bChange a line of the lore");
+            sender.sendMessage("§2/lore insert <line #> <line of text> §bInsert a line into the lore");
+            sender.sendMessage("§2/lore delete [line #] §bDelete a line of the lore (last line by default)");
+            sender.sendMessage("§2/lore clear §bClear all lines of the lore");
+        }
+        sender.sendMessage("§2/lore undo §bUndoes your last modification (up to 5 times)");
     }
 }

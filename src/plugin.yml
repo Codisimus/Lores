@@ -1,6 +1,6 @@
 name: Lores
 main: com.codisimus.plugins.lores.Lores
-version: 1.1.0
+version: 1.2.0
 author: Codisimus
 website: www.codisimus.com
 description: Modify Item names and lores
@@ -22,7 +22,21 @@ commands:
     permission: lores.admin
     permission-message: You do not have permission to do that
 permissions:
+  lores.lore:
+    default: false
+  lores.name:
+    default: false
+  lores.owner:
+    default: false
+  lores.color:
+    default: false
+  lores.format:
+    default: false
   lores.admin:
     default: op
-  lores.nomagic:
-    default: notop
+    children:
+      lores.lore: true
+      lores.name: true
+      lores.owner: true
+      lores.color: true
+      lores.format: true
