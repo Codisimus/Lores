@@ -90,7 +90,7 @@ public class Lores extends JavaPlugin implements CommandExecutor {
                 return true;
             }
 
-            String name = concatArgs(args, 1);
+            String name = concatArgs(sender, args, 1);
             if (name.contains("|")) {
                 int max = name.replaceAll("§[0-9a-klmnor]", "").length();
                 Iterator<String> itr = lore.iterator();
@@ -128,7 +128,7 @@ public class Lores extends JavaPlugin implements CommandExecutor {
                 return true;
             }
 
-            lore.add(concatArgs(args, 1));
+            lore.add(concatArgs(sender, args, 1));
             break;
 
         case DELETE: //Delete a line of the lore
@@ -189,7 +189,7 @@ public class Lores extends JavaPlugin implements CommandExecutor {
                 return true;
             }
 
-            lore.set(index, concatArgs(args, 2));
+            lore.set(index, concatArgs(sender, args, 2));
             break;
 
         case INSERT: //Insert a line into the lore
@@ -212,7 +212,7 @@ public class Lores extends JavaPlugin implements CommandExecutor {
                 return true;
             }
 
-            lore.add(i, concatArgs(args, 2));
+            lore.add(i, concatArgs(sender, args, 2));
             break;
 
         case CLEAR:
@@ -256,19 +256,33 @@ public class Lores extends JavaPlugin implements CommandExecutor {
 
     /**
      * Concats arguments together to create a sentence from words
-     * This also replaces & with § to add color codes to the String
+     * This also replaces & with § to add color codes to
+     * the String if the sender has the needed permissions
      *
+     * @param sender the Player concating
      * @param args the arguments to concat
      * @param first Which argument should the sentence start with
      * @return The new String that was created
      */
-    private static String concatArgs(String[] args, int first) {
-        String string = "";
-        for (int i = first; i <= args.length - 1; i++) {
-            string += " " + args[i].replace('&', '§');
+    private static String concatArgs(CommandSender sender, String[] args, int first) {
+        StringBuilder sb = new StringBuilder();
+        if (first > args.length) {
+            return "";
         }
-        string = string.replaceAll("§[lnokm]", "");
-        return string.isEmpty() ? string : string.substring(1);
+        for (int i = first; i <= args.length - 1; i++) {
+            sb.append(" ");
+            sb.append(args[i].replace('&', '§'));
+        }
+        String string = sb.substring(1);
+
+        if (!sender.hasPermission("lores.color")) {
+            string = string.replaceAll("§[0-9a-f]", "");
+        }
+        if (!sender.hasPermission("lores.format")) {
+            string = string.replaceAll("§[lnokm]", "");
+        }
+
+        return string;
     }
 
     /**
