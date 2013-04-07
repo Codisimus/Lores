@@ -1,6 +1,8 @@
 package com.codisimus.plugins.lores;
 
 import java.util.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -13,6 +15,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Lores extends JavaPlugin implements CommandExecutor {
     private static enum Action { NAME, OWNER, ADD, DELETE, SET, INSERT, CLEAR, UNDO }
     private static HashMap<String, LinkedList<ItemStack>> undo = new HashMap<String, LinkedList<ItemStack>>();
+    char[] colorCodes = {
+        '0', '1', '2', '3', '4',
+        '5', '6', '7', '8', '9',
+        'a', 'b', 'c', 'd', 'e',
+        'f', 'l', 'n', 'o', 'k', 'm', 'r'
+    };
 
     @Override
     public void onEnable () {
@@ -41,7 +49,16 @@ public class Lores extends JavaPlugin implements CommandExecutor {
         Player player = (Player) sender;
 
         ItemStack item = player.getItemInHand();
+
+        //Retrieve the meta and make one if it doesn't exist
         ItemMeta meta = item.getItemMeta();
+        if (meta == null) {
+            meta = Bukkit.getItemFactory().getItemMeta(item.getType());
+            if (meta == null) {
+                player.sendMessage("§4The Item you are holding does not support Lore");
+                return true;
+            }
+        }
 
         //There must be at least one argument
         if (args.length < 1) {
@@ -271,18 +288,22 @@ public class Lores extends JavaPlugin implements CommandExecutor {
         }
         for (int i = first; i <= args.length - 1; i++) {
             sb.append(" ");
-            sb.append(args[i].replace('&', '§'));
+            sb.append(ChatColor.translateAlternateColorCodes('&', args[i]));
         }
         String string = sb.substring(1);
 
-        if (!sender.hasPermission("lores.color")) {
-            string = string.replaceAll("§[0-9a-f]", "");
-        }
-        if (!sender.hasPermission("lores.format")) {
-            string = string.replaceAll("§[lnokm]", "");
+        char[] charArray = string.toCharArray();
+        boolean modified = false;
+        for (int i = 0; i < charArray.length; i++) {
+            if (charArray[i] == '§') {
+                if (!sender.hasPermission("lores.color." + charArray[i + 1])) {
+                    charArray[i] = '?';
+                    modified = true;
+                }
+            }
         }
 
-        return string;
+        return modified ? String.copyValueOf(charArray) : string;
     }
 
     /**
