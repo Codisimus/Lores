@@ -258,8 +258,16 @@ public class Lores extends JavaPlugin implements CommandExecutor {
                 return true;
             }
 
+            ItemStack undoneItem = list.removeFirst();
+
+            //Dupe fix
+            int stackSize = item.getAmount();
+            if (undoneItem.getAmount() != stackSize) {
+                undoneItem.setAmount(stackSize);
+            }
+
             //Place the old Item in the Player's hand
-            player.setItemInHand(list.removeFirst());
+            player.setItemInHand(undoneItem);
             player.sendMessage("§5The last modification you made on this item has been undone!");
             return true;
         }
