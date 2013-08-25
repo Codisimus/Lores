@@ -141,7 +141,7 @@ public class Lores extends JavaPlugin implements CommandExecutor {
             break;
 
         case ADD: //Add a line to the end of the lore
-            if (!sender.hasPermission("lores.name") || args.length < 2) {
+            if (!sender.hasPermission("lores.lore") || args.length < 2) {
                 sendHelp(sender);
                 return true;
             }
