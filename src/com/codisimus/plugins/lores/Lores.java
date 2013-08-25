@@ -3,6 +3,7 @@ package com.codisimus.plugins.lores;
 import java.util.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -259,7 +260,7 @@ public class Lores extends JavaPlugin implements CommandExecutor {
             }
 
             ItemStack undoneItem = list.removeFirst();
-            if (!item.isSimilar(undoneItem)) {
+            if (!item.isSimilar(undoneItem) && item.getType() != Material.SKULL_ITEM) {
                 player.sendMessage("§4You have not yet modified this Item!");
                 return true;
             }
