@@ -15,7 +15,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Lores extends JavaPlugin implements CommandExecutor {
     private static enum Action { NAME, OWNER, ADD, DELETE, SET, INSERT, CLEAR, UNDO }
-    private static HashMap<String, LinkedList<ItemStack>> undo = new HashMap<String, LinkedList<ItemStack>>();
+    private static final HashMap<String, LinkedList<ItemStack>> undo = new HashMap<String, LinkedList<ItemStack>>();
     char[] colorCodes = {
         '0', '1', '2', '3', '4',
         '5', '6', '7', '8', '9',
@@ -27,17 +27,6 @@ public class Lores extends JavaPlugin implements CommandExecutor {
     public void onEnable () {
         //Register the lore command
         getCommand("lore").setExecutor(this);
-
-        //Retrieve the version file
-        Properties version = new Properties();
-        try {
-            version.load(this.getResource("version.properties"));
-        } catch (Exception ex) {
-        }
-
-        //Log the version and build numbers
-        getLogger().info("Lores " + this.getDescription().getVersion()
-                + " (Build " + version.getProperty("Build") + ") is enabled!");
     }
 
     @Override
@@ -49,7 +38,7 @@ public class Lores extends JavaPlugin implements CommandExecutor {
         }
         Player player = (Player) sender;
 
-        ItemStack item = player.getItemInHand();
+        ItemStack item = player.getEquipment().getItemInMainHand();
 
         //Retrieve the meta and make one if it doesn't exist
         ItemMeta meta = item.getItemMeta();
@@ -83,7 +72,7 @@ public class Lores extends JavaPlugin implements CommandExecutor {
         }
 
         //Generate the String id for the Player/Item
-        String id = player.getName() + "'" + item.getTypeId();
+        String id = player.getName() + "'" + item.getType().name();
 
         if (action != Action.UNDO) {
             //Create an undo List for the Player if there isn't one
@@ -272,7 +261,7 @@ public class Lores extends JavaPlugin implements CommandExecutor {
             }
 
             //Place the old Item in the Player's hand
-            player.setItemInHand(undoneItem);
+            player.getEquipment().setItemInMainHand(undoneItem);
             player.sendMessage("§5The last modification you made on this item has been undone!");
             return true;
         }
@@ -308,7 +297,7 @@ public class Lores extends JavaPlugin implements CommandExecutor {
         char[] charArray = string.toCharArray();
         boolean modified = false;
         for (int i = 0; i < charArray.length; i++) {
-            if (charArray[i] == '§') {
+            if (charArray[i] == ChatColor.COLOR_CHAR) {
                 if (!sender.hasPermission("lores.color." + charArray[i + 1])) {
                     charArray[i] = '?';
                     modified = true;
